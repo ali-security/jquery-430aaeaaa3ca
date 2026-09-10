@@ -1,3 +1,11 @@
 language: node_js
 node_js:
 - '0.10'
+install:
+- npm install
+script:
+- npm test
+- python3 test/server.py 8000 &
+- phantomjs test/runner.js http://127.0.0.1:8000/test/smoke.html
+- phantomjs test/runner.js "http://127.0.0.1:8000/test/index.html?filter=isPlainObject"
+- phantomjs test/runner.js "http://127.0.0.1:8000/test/index.html?filter=Object.prototype%20pollution"

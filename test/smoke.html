@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>jQuery QUnit smoke tests</title>
+	<link rel="stylesheet" href="/test/libs/qunit/qunit.css">
+	<script src="/test/libs/qunit/qunit.js"></script>
+	<script src="/dist/jquery.js"></script>
+</head>
+<body>
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+	<script>
+		QUnit.module( "jQuery smoke" );
+
+		QUnit.test( "parseHTML creates DOM nodes", function( assert ) {
+			var nodes = jQuery.parseHTML( "<p class='smoke'>hello</p>" );
+
+			assert.equal( nodes.length, 1, "one node was parsed" );
+			assert.equal( nodes[ 0 ].nodeName.toLowerCase(), "p", "the element type is preserved" );
+			assert.equal( nodes[ 0 ].className, "smoke", "the element attributes are preserved" );
+			assert.equal( nodes[ 0 ].innerHTML, "hello", "the element content is preserved" );
+		} );
+
+		QUnit.test( "selectors and DOM manipulation work", function( assert ) {
+			var fixture = jQuery( "#qunit-fixture" );
+
+			fixture.append( "<ul><li class='item'>one</li><li class='item'>two</li></ul>" );
+			assert.equal( fixture.find( "li.item" ).length, 2, "the selector finds inserted elements" );
+			fixture.find( "li.item:first" ).text( "updated" ).addClass( "selected" );
+			assert.equal( fixture.find( "li.selected" ).text(), "updated", "text and classes can be changed" );
+		} );
+
+		QUnit.asyncTest( "same-origin AJAX returns the fixture response", function() {
+			jQuery.ajax( {
+				url: "/test/data/name.php?name=foo",
+				dataType: "text"
+			} ).done( function( response ) {
+				equal( response, "bar", "the PHP fixture returns bar" );
+			} ).fail( function() {
+				ok( false, "the PHP fixture request succeeds" );
+			} ).always( function() {
+				QUnit.start();
+			} );
+		} );
+	</script>
+</body>
+</html>
